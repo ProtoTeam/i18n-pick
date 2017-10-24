@@ -1,0 +1,27 @@
+{
+  "name": "@alipay/i18n-pick",
+  "version": "1.0.14",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "i18n-pick": "bin/i18n-pick.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "yifei.pyf",
+  "license": "ISC",
+  "publishConfig": {
+    "registry": "http://registry.npm.alibaba-inc.com"
+  },
+  "dependencies": {
+    "babel-core": "^6.24.1",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "commander": "^2.9.0",
+    "glob": "^7.1.1",
+    "n-readlines": "^0.2.7"
+  }
+}
