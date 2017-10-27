@@ -1,5 +1,5 @@
 {
-  "name": "@alipay/i18n-pick",
+  "name": "i18n-pick",
   "version": "1.0.15",
   "description": "",
   "main": "index.js",
@@ -9,11 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "yifei.pyf",
+  "author": "panyifei",
   "license": "ISC",
-  "publishConfig": {
-    "registry": "http://registry.npm.alibaba-inc.com"
-  },
   "dependencies": {
     "babel-core": "^6.24.1",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
