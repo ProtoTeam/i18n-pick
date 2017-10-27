@@ -4,6 +4,21 @@
 const fs = require('fs');
 
 const needImport = [];
+
+function replace(text, chinese, replaceString) {
+    let textArr = text.split(/intl\.get\(.+?\)/);
+    const newArr = JSON.parse(JSON.stringify(textArr));
+    textArr.forEach((item, index, arr) => {
+        arr[index] = item.replace(chinese, replaceString);
+    });
+    newArr.forEach((item, index, arr) => {
+        if (item !== textArr[index]) {
+            text = text.replace(item, textArr[index]);
+        }
+    })
+    return text;
+}
+
 function generateAndWrite(text, left, right) {
     if (!text) return;
     const detailArr = text.split('#');
@@ -13,19 +28,20 @@ function generateAndWrite(text, left, right) {
 
     const temp1 = arr[detailArr[2] - 1];
     const temp2 = arr[detailArr[2]];
-    const replaceString = `${left}intl.get('${detailArr[4]}') /* ${detailArr[0].split('').join(' ')} */${right}`;
+    let chinese = detailArr[0].replace(/\\"/g, '"');
+    const replaceString = `${left}intl.get('${chinese.replace(/'/g, '\\\'')}')${right}`;
     // 这里是为了匹配前后如果有引号的情况
-    arr[detailArr[2] - 1] = arr[detailArr[2] - 1].replace(`"${detailArr[0]}"`, replaceString);
+    arr[detailArr[2] - 1] = replace(arr[detailArr[2] - 1], `"${chinese}"`, replaceString);
     if (temp1 === arr[detailArr[2] - 1]) {
-        arr[detailArr[2] - 1] = arr[detailArr[2] - 1].replace(`'${detailArr[0]}'`, replaceString);
+        arr[detailArr[2] - 1] = replace(arr[detailArr[2] - 1], `'${chinese}'`, replaceString);
         if (temp1 === arr[detailArr[2] - 1]) {
-            arr[detailArr[2] - 1] = arr[detailArr[2] - 1].replace(detailArr[0], replaceString);
+            arr[detailArr[2] - 1] = replace(arr[detailArr[2] - 1], chinese, replaceString);
             if (temp1 === arr[detailArr[2] - 1]) {
-                arr[detailArr[2]] = arr[detailArr[2]].replace(`"${detailArr[0]}"`, replaceString);
+                arr[detailArr[2]] = replace(arr[detailArr[2]], `"${chinese}"`, replaceString);
                 if (temp2 === arr[detailArr[2]]) {
-                    arr[detailArr[2]] = arr[detailArr[2]].replace(`'${detailArr[0]}'`, replaceString);
+                    arr[detailArr[2]] = replace(arr[detailArr[2]], `'${chinese}'`, replaceString);
                     if (temp2 === arr[detailArr[2]]) {
-                        arr[detailArr[2]] = arr[detailArr[2]].replace(detailArr[0], replaceString);
+                        arr[detailArr[2]] = replace(arr[detailArr[2]], chinese, replaceString);
                         if (temp2 === arr[detailArr[2]]) {
                             if (arr[detailArr[2]].indexOf(detailArr[0]) !== -1 ||
                                 arr[detailArr[2] - 1].indexOf(detailArr[0]) !== -1) {
@@ -45,6 +61,7 @@ function generateAndWrite(text, left, right) {
 
     fs.writeFileSync(detailArr[1], result, 'utf8');
 }
+
 
 // 修改所有的jsx内容
 const jsxData = fs.readFileSync('i18n-messages/jsx.txt', 'utf8');
