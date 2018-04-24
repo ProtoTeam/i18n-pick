@@ -3,11 +3,7 @@ const _config = {
   "importStatement": "import { I18N } from '@common/I18N';",
   "callStatement": "I18N.get",
   "targetDir": "i18n-messages",
-  "exclude": [
-    "**/*Lab*/**",
-    "**/demo.{js,jsx}",
-    "**/moduleUdfDefault.js"
-  ]
+  "exclude": []
 }
 const path = require('path');
 module.exports = function () {
