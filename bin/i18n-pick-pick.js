@@ -2,8 +2,19 @@
 // vim: set ft=javascript:
 
 const fs = require('fs');
+const program = require('commander');
+const path = require('path');
+const config = require('../i18n.config')();
+
+program.parse(process.argv);
+
 
 const needImport = [];
+const importStatement = config.importStatement;
+const callStatement = config.callStatement;
+const targetDir = config.targetDir;
+const sourceMapPath = path.join(process.cwd(), targetDir, 'zh-CH.json');
+
 
 function replace(text, chinese, replaceString) {
     let textArr = text.split(/intl\.get\(.+?\)/);
@@ -19,33 +30,38 @@ function replace(text, chinese, replaceString) {
     return text;
 }
 
-function generateAndWrite(text, left, right) {
-    if (!text) return;
-    const detailArr = text.split('#');
+function generateAndWrite(sourceObj) {
+    if (!sourceObj) return;
+    const { key, text, textType, filename, line, column } = sourceObj;
+
+    const left = textType == 'jsx' ? '{' : '';
+    const right = textType == 'jsx' ? '}' : '';
+
     // 拿到文件数据
-    const data = fs.readFileSync(detailArr[1], 'utf8');
+    const data = fs.readFileSync(filename, 'utf8');
     const arr = data.split('\n');
 
-    const temp1 = arr[detailArr[2] - 1];
-    const temp2 = arr[detailArr[2]];
-    let chinese = detailArr[0].replace(/\\"/g, '"');
-    const replaceString = `${left}intl.get('${chinese.replace(/'/g, '\\\'')}')${right}`;
+    const temp1 = arr[line - 1];
+    const temp2 = arr[line];
+    let chinese = text.replace(/\\"/g, '"');
+    const replaceString = `${left}${callStatement}('${key}')${right}`;
     // 这里是为了匹配前后如果有引号的情况
-    arr[detailArr[2] - 1] = replace(arr[detailArr[2] - 1], `"${chinese}"`, replaceString);
-    if (temp1 === arr[detailArr[2] - 1]) {
-        arr[detailArr[2] - 1] = replace(arr[detailArr[2] - 1], `'${chinese}'`, replaceString);
-        if (temp1 === arr[detailArr[2] - 1]) {
-            arr[detailArr[2] - 1] = replace(arr[detailArr[2] - 1], chinese, replaceString);
-            if (temp1 === arr[detailArr[2] - 1]) {
-                arr[detailArr[2]] = replace(arr[detailArr[2]], `"${chinese}"`, replaceString);
-                if (temp2 === arr[detailArr[2]]) {
-                    arr[detailArr[2]] = replace(arr[detailArr[2]], `'${chinese}'`, replaceString);
-                    if (temp2 === arr[detailArr[2]]) {
-                        arr[detailArr[2]] = replace(arr[detailArr[2]], chinese, replaceString);
-                        if (temp2 === arr[detailArr[2]]) {
-                            if (arr[detailArr[2]].indexOf(detailArr[0]) !== -1 ||
-                                arr[detailArr[2] - 1].indexOf(detailArr[0]) !== -1) {
-                                console.log('失败，请手动替换', text);
+    arr[line - 1] = replace(arr[line - 1], `"${chinese}"`, replaceString);
+    if (temp1 === arr[line - 1]) {
+        arr[line - 1] = replace(arr[line - 1], `'${chinese}'`, replaceString);
+        if (temp1 === arr[line - 1]) {
+            arr[line - 1] = replace(arr[line - 1], chinese, replaceString);
+            if (temp1 === arr[line - 1]) {
+                arr[line] = replace(arr[line], `"${chinese}"`, replaceString);
+                if (temp2 === arr[line]) {
+                    arr[line] = replace(arr[line], `'${chinese}'`, replaceString);
+                    if (temp2 === arr[line]) {
+                        arr[line] = replace(arr[line], chinese, replaceString);
+                        if (temp2 === arr[line]) {
+                            if (arr[line].indexOf(text) !== -1 ||
+                                arr[line - 1].indexOf(text) !== -1) {
+                                console.log('失败，请手动替换', JSON.stringify(sourceObj, null, "\t"));
+                                return 0;
                             }
                         }
                     }
@@ -55,36 +71,47 @@ function generateAndWrite(text, left, right) {
     }
 
     const result = arr.join('\n');
-    if (needImport.indexOf(detailArr[1]) === -1) {
-        needImport.push(detailArr[1]);
+    if (needImport.indexOf(filename) === -1 && arr.indexOf(importStatement) === -1) {
+        needImport.push(filename);
     }
 
-    fs.writeFileSync(detailArr[1], result, 'utf8');
+    fs.writeFileSync(filename, result, 'utf8');
+    return 1;
 }
 
 
-// 修改所有的jsx内容
-const jsxData = fs.readFileSync('i18n-messages/jsx.txt', 'utf8');
-const jsxArr = jsxData.split('\n');
-jsxArr.forEach(text => {
-    generateAndWrite(text, '{', '}');
-});
+let data = null;
+try {
+    data = require(sourceMapPath);
+} catch(e) {
+    console.log('获取映射文件出错！', e);
+return;
+}
 
-// 修改所有的text内容
-const textData = fs.readFileSync('i18n-messages/text.txt', 'utf8');
-const textArr = textData.split('\n');
-textArr.forEach(text => {
-    generateAndWrite(text, '', '');
+data.forEach(item=>{
+    item.source.forEach(src=>{
+        const [filename, line, column] = src.location.split('#');
+        const opts = {
+            key: item.key,
+            text: item.defaultMessage,
+            textType: src.type,
+            filename: filename,
+            line: line,
+            column: column
+        };
+        const flag = generateAndWrite(opts);
+        if (flag) {
+            console.log('替换成功，'+opts.text+' => '+item.key+' #'+src.location);
+        }
+    })
 });
 
 // 这里加上文件头的import
 needImport.forEach(src => {
     fs.readFile(src, 'utf8', (err, data) => {
-        if (err) {
-            return console.log(err);
-        }
+        if (err) return console.log(err);
 
-        const result = `import intl from 'base/reactIntlUniversal';\n${data}`;
+        const result = `${importStatement}\n${data}`;
         fs.writeFile(src, result, 'utf8', e => {
             if (e) return console.log(e);
             return 1;

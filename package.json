@@ -1,6 +1,6 @@
 {
   "name": "i18n-pick",
-  "version": "1.0.15",
+  "version": "1.5.0",
   "description": "",
   "main": "index.js",
   "bin": {

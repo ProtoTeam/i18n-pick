@@ -4,7 +4,8 @@
 const program = require('commander');
 
 program
-  .version('1.0.15')
+  .version('1.5.0')
   .command('scan [path]', '扫描 React 项目')
-  .command('pick', '提取文案')
+  .command('pick', '替换文案')
+  .command('export', '导出文案')
   .parse(process.argv);
