@@ -36,3 +36,8 @@ i18n.config.json
   ]
 }
 ```
+
+### 贡献者
+多谢以下贡献者：
+
+ - [AceLeeWinnie] (https://github.com/AceLeeWinnie)
