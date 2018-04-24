@@ -20,7 +20,6 @@
 `./node_modules/i18n-pick/bin/i18n-pick.js export`
 
 ### 配置
-
 i18n.config.json
 ```js
 {
@@ -37,7 +36,8 @@ i18n.config.json
 }
 ```
 
+
 ### 贡献者
 多谢以下贡献者：
 
- - [AceLeeWinnie] (https://github.com/AceLeeWinnie)
+ - [AceLeeWinnie](https://github.com/AceLeeWinnie)
