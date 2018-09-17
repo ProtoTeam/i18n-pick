@@ -1,5 +1,5 @@
 # i18n-pick
-提取jsx项目中的中文文案
+提取react项目中的中文文案，目前已支持typescript
 
 具体使用参照掘金文章 [5分钟前端国际化](https://juejin.im/post/59eed7df518825469c747c14)
 
@@ -32,10 +32,19 @@ i18n.config.json
   // 不予扫描的文件，遵循 glob
   "exclude": [
     "**/demo.{js,jsx}"
-  ]
+  ],
+  // 是否统计函数参数中的中文
+  "callExpression": false,
+  // 自动中文做key
+  "autoZhKey": true,
 }
 ```
 
+### 更新
+### 1.6.0
+ - 支持 typescript 文件扫描
+ - 中文默认为key，默认不统计函数参数中的中文
+ - 开放配置
 
 ### 贡献者
 多谢以下贡献者：

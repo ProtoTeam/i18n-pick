@@ -3,7 +3,9 @@ const _config = {
   "importStatement": "import { I18N } from '@common/I18N';",
   "callStatement": "I18N.get",
   "targetDir": "i18n-messages",
-  "exclude": []
+  "exclude": [],
+  "callExpression": false,
+  "autoZhKey": true,
 }
 const path = require('path');
 module.exports = function () {
