@@ -41,6 +41,9 @@ i18n.config.json
 ```
 
 ### 更新
+### 1.7.0
+ - fix 导出的zh-CH.json的'key'为id，为了直接能运行atool-l10n
+
 ### 1.6.0
  - 支持 typescript 文件扫描
  - 中文默认为key，默认不统计函数参数中的中文

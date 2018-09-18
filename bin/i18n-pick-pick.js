@@ -92,7 +92,7 @@ data.forEach(item=>{
     item.source.forEach(src=>{
         const [filename, line, column] = src.location.split('#');
         const opts = {
-            key: item.key,
+            key: item.id,
             text: item.defaultMessage,
             textType: src.type,
             filename: filename,
@@ -101,7 +101,7 @@ data.forEach(item=>{
         };
         const flag = generateAndWrite(opts);
         if (flag) {
-            console.log('替换成功，'+opts.text+' => '+item.key+' #'+src.location);
+            console.log('替换成功，'+opts.text+' => '+opts.key+' #'+src.location);
         }
     })
 });

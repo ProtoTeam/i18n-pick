@@ -18,8 +18,8 @@ try {
 }
 const result = {};
 data.forEach(d=> {
-  if (result[d.key]) return console.log(`"${d.defaultMessage}"与"${result[d.key]}" key 值相同，请修改！`);
-  result[d.key] = d.defaultMessage
+  if (result[d.id]) return console.log(`"${d.defaultMessage}"与"${result[d.id]}" key 值相同，请修改！`);
+  result[d.id] = d.defaultMessage
 });
 // DONE: 重写 targetPath 文件
 fs.writeFile(targetPath, JSON.stringify(result, null, '\t'), function(err) {
